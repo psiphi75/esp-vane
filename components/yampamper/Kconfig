@@ -1,0 +1,29 @@
+menu "Yampamper Configuration"
+
+config WIFI_SSID
+    string "WiFi SSID"
+    default "myssid"
+    help
+        SSID (network name) for the example to connect to.
+
+config WIFI_PASSWORD
+    string "WiFi Password"
+    default "mypassword"
+    help
+        WiFi password (WPA or WPA2) for the example to use.
+
+        Can be left blank if the network has no security set.
+
+config MQTT_BROKER
+    string "MQTT Broker"
+    default "iot.eclipse.org"
+
+config MQTT_PORT
+    int "MQTT Port"
+    default 1883
+
+config MQTT_TOPIC
+    string "MQTT Topic"
+    default "ESP8266/sample/pub"
+
+endmenu
