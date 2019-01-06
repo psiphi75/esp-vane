@@ -156,17 +156,17 @@ void y_subscribe(messageHandler messageHandler)
   }
 }
 
-void y_publish(char *data)
+int y_publish(char *data)
 {
   if (!connected)
   {
     ESP_LOGE(TAG, "y_publish(): Need to connect first");
-    return;
+    return -1;
   }
   if (type != PUBLISHER)
   {
     ESP_LOGE(TAG, "y_publish(): Only publishers can publish");
-    return;
+    return -1;
   }
 
   if (pub_counter == 0)
@@ -189,6 +189,9 @@ void y_publish(char *data)
   if ((rc = MQTTPublish(&client, CONFIG_MQTT_TOPIC, &message)) != 0)
   {
     ESP_LOGE(TAG, "Return code from MQTT publish is %d", rc);
+    return rc;
   }
   ESP_LOGD(TAG, "Published '%s' on %s", (char *)message.payload, CONFIG_MQTT_TOPIC);
+
+  return 0;
 }

@@ -69,14 +69,29 @@ static void comms_task(void *arg)
 {
   if (comms_connect() != 0)
   {
-    ESP_LOGW(TAG, "Rebooting, because there was an error with the connection");
+    ESP_LOGE(TAG, "Rebooting, because there was an error with the connection");
     vTaskDelay(1000 / portTICK_RATE_MS);
     esp_restart();
   }
 
+  int num_errors = 0;
   while (true)
   {
-    publish(json_data);
+    int is_err = publish(json_data);
+    if (is_err)
+    {
+      num_errors += 1;
+    }
+    else
+    {
+      num_errors = 0;
+    }
+    if (num_errors > 5)
+    {
+      ESP_LOGE(TAG, "Rebooting, because there have been too many consective errors");
+      vTaskDelay(1000 / portTICK_RATE_MS);
+      esp_restart();
+    }
   }
 
   // Exit

@@ -3,6 +3,6 @@
 
 void comms_init(void);
 int comms_connect(void);
-void publish(char *str);
+int publish(char *str);
 
 #endif

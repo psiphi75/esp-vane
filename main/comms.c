@@ -112,7 +112,8 @@ int comms_connect(void)
   ESP_LOGI(TAG, "Connecting to mqtt://%s:%d", CONFIG_MQTT_BROKER, CONFIG_MQTT_PORT);
   return y_connect(PUBLISHER, &network, CONFIG_MQTT_BROKER, CONFIG_MQTT_PORT);
 }
-void publish(char *str)
+
+int publish(char *str)
 {
-  y_publish(str);
+  return y_publish(str);
 }
