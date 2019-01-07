@@ -41,9 +41,12 @@ static const char *TAG = "main";
 
 // FIXME: `json_data` is shared across two threads, this may blow up every once in while.
 char json_data[YAMPAMPER_MAX_DATA_LEN];
+char last_json_data[YAMPAMPER_MAX_DATA_LEN];
+
 static void imu_task(void *arg)
 {
   static uint64_t i = 1;
+  uint64_t num_equal = 0;
 
   imu_init();
 
@@ -54,6 +57,22 @@ static void imu_task(void *arg)
     if (i++ % 50 == 0)
     {
       imu_get_data(json_data);
+
+      // Crude way to check if the imu is frozen, should really fix this.
+      if (strcmp(json_data, last_json_data) == 0)
+      {
+        num_equal += 1;
+        if (num_equal > 10)
+        {
+          ESP_LOGE(TAG, "IMU values have been the same for too long, rebooting");
+          esp_restart();
+        }
+      }
+      else
+      {
+        num_equal = 0;
+      }
+      strcpy(last_json_data, json_data);
     }
 
     // Make the WDT happy
@@ -92,6 +111,9 @@ static void comms_task(void *arg)
       vTaskDelay(1000 / portTICK_RATE_MS);
       esp_restart();
     }
+
+    // This should work out to around 5 Hz
+    vTaskDelay(172 / portTICK_RATE_MS);
   }
 
   // Exit
@@ -101,8 +123,8 @@ static void comms_task(void *arg)
 void app_main(void)
 {
   comms_init();
-  xTaskCreate(comms_task, "comms_task", 1024 * 10, NULL, 10, NULL);
+  xTaskCreate(comms_task, "comms_task", 1024 * 10, NULL, 5, NULL);
 
-  vTaskDelay(1000 / portTICK_RATE_MS);
+  vTaskDelay(200 / portTICK_RATE_MS);
   xTaskCreate(imu_task, "imu_task", 1024 * 4, NULL, 10, NULL);
 }

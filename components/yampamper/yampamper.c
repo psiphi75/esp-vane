@@ -180,7 +180,7 @@ int y_publish(char *data)
 
   MQTTMessage message;
 
-  message.qos = QOS2;
+  message.qos = QOS1;
   message.retained = 0;
   message.payload = payload;
   message.payloadlen = strlen(payload);
