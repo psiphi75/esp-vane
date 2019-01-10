@@ -1,4 +1,4 @@
-menu "Yampamper Configuration"
+menu "MQTT Helper Configuration"
 
 config WIFI_SSID
     string "WiFi SSID"

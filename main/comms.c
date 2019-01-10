@@ -31,7 +31,7 @@
 #include "freertos/event_groups.h"
 
 #include "MQTTClient.h"
-#include "../components/yampamper/yampamper.h"
+#include "mqtt_helper.h"
 
 /* FreeRTOS event group to signal when we are connected & ready to make a request */
 static EventGroupHandle_t wifi_event_group;
@@ -110,10 +110,10 @@ int comms_connect(void)
   NetworkInit(&network);
 
   ESP_LOGI(TAG, "Connecting to mqtt://%s:%d", CONFIG_MQTT_BROKER, CONFIG_MQTT_PORT);
-  return y_connect(PUBLISHER, &network, CONFIG_MQTT_BROKER, CONFIG_MQTT_PORT);
+  return mqtt_connect(PUBLISHER, &network, CONFIG_MQTT_BROKER, CONFIG_MQTT_PORT);
 }
 
 int publish(char *str)
 {
-  return y_publish(str);
+  return mqtt_publish(str);
 }

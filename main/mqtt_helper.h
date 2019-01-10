@@ -16,41 +16,23 @@
  *                                                                           *
  *****************************************************************************/
 
-#ifndef __YAMPAMPER_H
-#define __YAMPAMPER_H
+#ifndef __MQTT_HELPER_H
+#define __MQTT_HELPER_H
 
 #include "MQTTClient.h"
 
 #define UUID_LEN (38)
-#define YAMPAMPER_MAX_DATA_LEN (127)
-#define YAMPAMPER_MAX_MESSAGE_LEN (255)
-
-/**
- * Meta data used to describe the message ordering and which client it came from.
- */
-typedef struct yampamper_meta_t
-{
-  uint64_t counter;        // The nth message sent
-  char clientId[UUID_LEN]; // The clientId, this may change
-} yampamper_meta_t;
-
-/**
- * A message encapusalated within a MQTT message.
- */
-typedef struct yampamper_msg_t
-{
-  char data[YAMPAMPER_MAX_MESSAGE_LEN]; // The information the client sends/receives
-  struct yampamper_meta_t meta;         // Information that the client does not see
-} yampamper_msg_t;
+#define MQTT_HELPER_MAX_DATA_LEN (127)
+#define MQTT_HELPER_MAX_MESSAGE_LEN (255)
 
 typedef enum
 {
   PUBLISHER,
   SUBSCRIBER
-} yampamper_type_t;
+} mqtt_helper_type_t;
 
-int y_connect(yampamper_type_t _type, Network *_network, char *mqtt_broker, int mqtt_port);
-int y_publish(char *data);
-void y_subscribe(messageHandler messageHandler);
+int mqtt_connect(mqtt_helper_type_t _type, Network *_network, char *mqtt_broker, int mqtt_port);
+int mqtt_publish(char *data);
+void mqtt_subscribe(messageHandler messageHandler);
 
 #endif

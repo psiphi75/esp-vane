@@ -29,7 +29,7 @@
 #include "esp_err.h"
 #include "esp_task_wdt.h"
 
-#include "../components/yampamper/yampamper.h"
+#include "mqtt_helper.h"
 #include "../components/mpu9250/common.h"
 
 #include "imu.h"
@@ -40,8 +40,8 @@ static const char *TAG = "main";
 #define I2C_MASTER_NUM I2C_NUM_0 /*!< I2C port number for master dev */
 
 // FIXME: `json_data` is shared across two threads, this may blow up every once in while.
-char json_data[YAMPAMPER_MAX_DATA_LEN];
-char last_json_data[YAMPAMPER_MAX_DATA_LEN];
+char json_data[MQTT_HELPER_MAX_DATA_LEN];
+char last_json_data[MQTT_HELPER_MAX_DATA_LEN];
 
 static void imu_task(void *arg)
 {

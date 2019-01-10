@@ -26,16 +26,16 @@
 
 #include "MQTTClient.h"
 
-#include "yampamper.h"
-static const char *TAG = "yampamper";
+#include "mqtt_helper.h"
+static const char *TAG = "mqtt_helper";
 
-static yampamper_type_t type;
+static mqtt_helper_type_t type;
 static bool connected = false;
 static uint32_t pub_counter = 0;
 static char clientId[UUID_LEN];
 MQTTClient client;
 Network *network;
-unsigned char sendbuf[YAMPAMPER_MAX_MESSAGE_LEN + 50], readbuf[YAMPAMPER_MAX_MESSAGE_LEN + 50] = {0};
+unsigned char sendbuf[MQTT_HELPER_MAX_MESSAGE_LEN + 50], readbuf[MQTT_HELPER_MAX_MESSAGE_LEN + 50] = {0};
 
 void uuid(char buf[UUID_LEN])
 {
@@ -63,7 +63,7 @@ void uuid(char buf[UUID_LEN])
   buf[UUID_LEN - 1] = '\0';
 }
 
-int y_connect(yampamper_type_t _type, Network *_network, char *mqtt_broker, int mqtt_port)
+int mqtt_connect(mqtt_helper_type_t _type, Network *_network, char *mqtt_broker, int mqtt_port)
 {
   if (connected)
   {
@@ -101,7 +101,7 @@ int y_connect(yampamper_type_t _type, Network *_network, char *mqtt_broker, int 
 #endif
 
   connectData.MQTTVersion = 3;
-  connectData.clientID.cstring = "ESP8266_yampamper";
+  connectData.clientID.cstring = "ESP8266_mqtt_helper";
 
   if ((rc = MQTTConnect(&client, &connectData)) != 0)
   {
@@ -116,32 +116,27 @@ int y_connect(yampamper_type_t _type, Network *_network, char *mqtt_broker, int 
   return 0;
 }
 
-void y_to_str(char *data, char *str)
+void mqtt_to_str(char *data, char *str)
 {
-  if (strlen(data) >= YAMPAMPER_MAX_DATA_LEN)
+  if (strlen(data) >= MQTT_HELPER_MAX_DATA_LEN)
   {
-    ESP_LOGE(TAG, "y_to_str(): data is too long");
+    ESP_LOGE(TAG, "mqtt_to_str(): data is too long");
     return;
   }
 
-  snprintf(str,
-           YAMPAMPER_MAX_MESSAGE_LEN,
-           "{\"data\":%s,\"meta\":{\"counter\":%lu,\"clientId\":\"%s\"}}",
-           data,
-           (unsigned long)pub_counter,
-           clientId);
+  strncpy(str, data, MQTT_HELPER_MAX_MESSAGE_LEN);
 }
 
-void y_subscribe(messageHandler messageHandler)
+void mqtt_subscribe(messageHandler messageHandler)
 {
   if (!connected)
   {
-    ESP_LOGE(TAG, "y_subscribe(): Need to connect first");
+    ESP_LOGE(TAG, "mqtt_subscribe(): Need to connect first");
     return;
   }
   if (type != SUBSCRIBER)
   {
-    ESP_LOGE(TAG, "y_subscribe(): Only subscribers can subscribe");
+    ESP_LOGE(TAG, "mqtt_subscribe(): Only subscribers can subscribe");
     return;
   }
 
@@ -156,16 +151,16 @@ void y_subscribe(messageHandler messageHandler)
   }
 }
 
-int y_publish(char *data)
+int mqtt_publish(char *data)
 {
   if (!connected)
   {
-    ESP_LOGE(TAG, "y_publish(): Need to connect first");
+    ESP_LOGE(TAG, "mqtt_publish(): Need to connect first");
     return -1;
   }
   if (type != PUBLISHER)
   {
-    ESP_LOGE(TAG, "y_publish(): Only publishers can publish");
+    ESP_LOGE(TAG, "mqtt_publish(): Only publishers can publish");
     return -1;
   }
 
@@ -173,8 +168,8 @@ int y_publish(char *data)
   {
     uuid(clientId);
   }
-  char payload[YAMPAMPER_MAX_MESSAGE_LEN];
-  y_to_str(data, payload);
+  char payload[MQTT_HELPER_MAX_MESSAGE_LEN];
+  mqtt_to_str(data, payload);
 
   pub_counter += 1;
 
