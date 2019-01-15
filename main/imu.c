@@ -92,9 +92,9 @@ void imu_get_data(char *str)
   float temp;
   ESP_ERROR_CHECK(get_temperature_celsius(&temp));
 
-  float heading, pitch, roll;
-  MadgwickGetEulerAnglesDegrees(&heading, &pitch, &roll);
-  sprintf(str, "{\"heading\":%2.3f,\"pitch\":%2.3f,\"roll\":%2.3f,\"temp\":%2.1f}", heading, pitch, roll, temp);
+  float mag_heading, pitch, roll;
+  MadgwickGetEulerAnglesDegrees(&mag_heading, &pitch, &roll);
+  sprintf(str, "{\"mag_heading\":%2.3f,\"pitch\":%2.3f,\"roll\":%2.3f,\"temp\":%2.1f}", mag_heading, pitch, roll, temp);
 }
 
 void close_imu(void)

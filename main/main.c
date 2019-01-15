@@ -61,6 +61,7 @@ static void imu_task(void *arg)
       // Crude way to check if the imu is frozen, should really fix this.
       if (strcmp(json_data, last_json_data) == 0)
       {
+        ESP_LOGW(TAG, "Found equal values");
         num_equal += 1;
         if (num_equal > 10)
         {
